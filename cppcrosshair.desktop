@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Crosshair ToolKit
+Comment=Pixel crosshair editor and ultralight overlay
+Exec=crosshair_editor
+Icon=games-config
+Terminal=false
+Categories=Game;Utility;
+Keywords=crosshair;overlay;game;aim;
+StartupNotify=true
