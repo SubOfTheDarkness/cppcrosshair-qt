@@ -210,7 +210,11 @@ void OverlayEditorWindow::toggleOverlayProcess() {
         ui->ctrl_log_text->clear();
         ui->ctrl_log_text->append("[*] Launching crosshair_overlay as a single independent instance...");
 
-        overlayProcess->start("./crosshair_overlay", QStringList());
+        if (QFile::exists("./crosshair_overlay")) {
+            overlayProcess->start("./crosshair_overlay", QStringList());
+        } else {
+            overlayProcess->start("crosshair_overlay", QStringList()); 
+        }
         
         if (!overlayProcess->waitForStarted(1000)) {
             ui->ctrl_log_text->append("[!] Error: Could not execute binary!");
