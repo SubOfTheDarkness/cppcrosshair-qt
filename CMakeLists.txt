@@ -53,7 +53,7 @@ set(CPACK_PACKAGE_VERSION "1.0.0")
 set(CPACK_PACKAGE_RELEASE "1")
 set(CPACK_PACKAGE_CONTACT "SubOfTheDarkness <204970490+SubOfTheDarkness@users.noreply.github.com>")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Pixel crosshair manager: standalone lightweight X11 overlay and Qt6 editor")
-set(CPACK_PACKAGE_VENDOR "Sub")
+set(CPACK_PACKAGE_VENDOR "SubOfTheDarkness")
 
 set(CPACK_GENERATOR "DEB")
 set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
