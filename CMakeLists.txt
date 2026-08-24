@@ -48,6 +48,8 @@ install(TARGETS crosshair_editor crosshair_overlay DESTINATION bin)
 
 install(FILES cppcrosshair.desktop DESTINATION share/applications)
 
+install(FILES icon.png DESTINATION share/pixmaps RENAME cppcrosshair.png)
+
 set(CPACK_PACKAGE_NAME "cppcrosshair-toolkit")
 set(CPACK_PACKAGE_VERSION "1.0.0")
 set(CPACK_PACKAGE_RELEASE "1")

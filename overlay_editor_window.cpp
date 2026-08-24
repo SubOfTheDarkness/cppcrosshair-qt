@@ -5,6 +5,7 @@
 #include <QTextStream>
 #include <QMessageBox>
 #include <QRegularExpression>
+#include "icon.xpm"
 
 OverlayEditorWindow::OverlayEditorWindow(QWidget *parent)
     : QWidget(parent)
@@ -12,6 +13,7 @@ OverlayEditorWindow::OverlayEditorWindow(QWidget *parent)
 {
     ui->setupUi(this);
     overlayProcess = new QProcess(this);
+    this->setWindowIcon(QIcon(QPixmap(app_icon_xpm)));
 
     ui->verticalLayout_2->setAlignment(ui->pixel_canvas, Qt::AlignCenter);
 

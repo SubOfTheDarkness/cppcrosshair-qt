@@ -4,9 +4,31 @@
 #include <X11/xpm.h>
 #include <unistd.h>
 #include <iostream>
+#include <fstream>
+#include <signal.h>
+#include <sys/stat.h>
 #include "config_parser.h"
 
 int main() {
+    const std::string pid_path = "/tmp/crosshair_overlay.pid";
+
+    std::ifstream check_file(pid_path);
+    if (check_file.is_open()) {
+        pid_t old_pid;
+        if (check_file >> old_pid) {
+            if (kill(old_pid, SIGTERM) == 0) {
+                usleep(50000); 
+            }
+        }
+        check_file.close();
+    }
+
+    std::ofstream pid_file(pid_path, std::ios::trunc);
+    if (pid_file.is_open()) {
+        pid_file << getpid();
+        pid_file.close();
+    }
+
     Config cfg = loadConfig();
 
     Display* display = XOpenDisplay(NULL);
@@ -64,6 +86,8 @@ int main() {
     while (true) {
         sleep(1);
     }
+
+    unlink(pid_path.c_str());
 
     XCloseDisplay(display);
     return 0;

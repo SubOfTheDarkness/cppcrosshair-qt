@@ -53,7 +53,7 @@ makepkg -si
 * `pixel_canvas.h / .cpp` — Custom promoted pixel-art widget managing manual painter layers, chess grid tiles, and coordinate calculations.
 * `cppcrosshair.desktop` — Desktop shortcut configuration profile.
 
-## ayland Compatibility
+## Wayland Compatibility
 
 Since this overlay is built natively on top of pure X11/Xlib (`override_redirect`), it runs via **XWayland** on modern Wayland-based desktops. By default, the window manager might hide the crosshair beneath native Wayland windows or games.
 
