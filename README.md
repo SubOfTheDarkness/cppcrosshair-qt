@@ -52,3 +52,16 @@ makepkg -si
 * `overlay_editor_window.h / .cpp / .ui` — Controller logic managing the layout matrix, palette routing, and process pgrep attachment tracking.
 * `pixel_canvas.h / .cpp` — Custom promoted pixel-art widget managing manual painter layers, chess grid tiles, and coordinate calculations.
 * `cppcrosshair.desktop` — Desktop shortcut configuration profile.
+
+## ayland Compatibility
+
+Since this overlay is built natively on top of pure X11/Xlib (`override_redirect`), it runs via **XWayland** on modern Wayland-based desktops. By default, the window manager might hide the crosshair beneath native Wayland windows or games.
+
+### How to fix it:
+
+1. **Recommended (Best Stability & Performance):** Switch your desktop session from **Wayland** to **X11** on your system login screen (Log Out -> Select X11 -> Log In). This allows the overlay to function flawlessly as intended.
+2. **Alternative (Window Rules Workaround):** If you must stay on Wayland, force the system to render the crosshair on top:
+   * Open **System Settings** -> **Window Management** -> **Window Rules**.
+   * Click **Add New Rule...** and set the Window class to `crosshair_overlay`.
+   * Add the **Keep above** property, set it to **Force**, and select **Yes**.
+   * Apply changes.
