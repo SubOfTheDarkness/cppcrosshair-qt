@@ -9,7 +9,6 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets)
-
 find_package(X11 REQUIRED)
 
 if(NOT X11_Xpm_FOUND)
@@ -21,16 +20,16 @@ add_executable(crosshair_overlay overlay_main.cpp)
 set_target_properties(crosshair_overlay PROPERTIES 
     AUTOMOC OFF 
     AUTOUIC OFF
+    AUTORCC OFF
 )
 
 target_link_libraries(crosshair_overlay PRIVATE 
     X11::X11 
     X11::Xext
-    Xpm
+    X11::Xpm
 )
 
-target_compile_options(crosshair_overlay PRIVATE -Os -s)
-
+target_compile_options(crosshair_overlay PRIVATE -Os)
 
 add_executable(crosshair_editor
     editor_main.cpp
@@ -43,11 +42,8 @@ add_executable(crosshair_editor
 target_include_directories(crosshair_editor PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(crosshair_editor PRIVATE Qt6::Core Qt6::Gui Qt6::Widgets)
 
-
 install(TARGETS crosshair_editor crosshair_overlay DESTINATION bin)
-
 install(FILES cppcrosshair.desktop DESTINATION share/applications)
-
 install(FILES icon.png DESTINATION share/pixmaps RENAME cppcrosshair.png)
 
 set(CPACK_PACKAGE_NAME "cppcrosshair-toolkit")
@@ -57,9 +53,12 @@ set(CPACK_PACKAGE_CONTACT "SubOfTheDarkness <204970490+SubOfTheDarkness@users.no
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Pixel crosshair manager: standalone lightweight X11 overlay and Qt6 editor")
 set(CPACK_PACKAGE_VENDOR "SubOfTheDarkness")
 
+set(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT) 
+
 set(CPACK_GENERATOR "DEB")
 set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
-
 set(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6, libqt6widgets6 (>= 6.0), libx11-6, libxext6, libxpm4, procps")
+
+set(CPACK_STRIP_FILES TRUE)
 
 include(CPack)
