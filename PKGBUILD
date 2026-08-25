@@ -4,19 +4,17 @@ pkgver=1.0.0
 pkgrel=1
 pkgdesc="Pixel crosshair manager: standalone lightweight X11 overlay and Qt6 editor"
 arch=('x86_64')
-url="https://github.com/SubOfTheDarkness/cppcrosshair-qt"
+url="https://github.com"
 license=('GPL-3.0-or-later')
 depends=('qt6-base' 'libx11' 'libxext' 'libxpm' 'procps-ng')
 makedepends=('cmake')
+options=('!debug')
 
 source=()
 sha256sums=()
-options=('!debug')
 
 build() {
-  find "$startdir" -maxdepth 1 ! -name "src" ! -name "pkg" ! -name ".git" ! -name "$pkgname*" -exec cp -t "$srcdir" -r {} + 2>/dev/null || true
-
-  cmake -B build -S "$srcdir" \
+  cmake -B build -S "$startdir" \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=/usr
   cmake --build build

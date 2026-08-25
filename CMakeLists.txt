@@ -31,7 +31,7 @@ target_link_libraries(crosshair_overlay PRIVATE
 
 target_compile_options(crosshair_overlay PRIVATE -Os)
 
-add_executable(crosshair_editor
+add_executable(cppcrosshair-editor
     editor_main.cpp
     overlay_editor_window.h
     overlay_editor_window.cpp
@@ -41,15 +41,16 @@ add_executable(crosshair_editor
     terminal_about_dialog.cpp
     terminal_about_dialog.h
 )
-target_include_directories(crosshair_editor PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(crosshair_editor PRIVATE 
+target_include_directories(cppcrosshair-editor PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(cppcrosshair-editor PRIVATE 
     Qt6::Core 
     Qt6::Gui 
     Qt6::Widgets
     X11::X11
 )
 
-install(TARGETS crosshair_editor crosshair_overlay DESTINATION bin)
+
+install(TARGETS cppcrosshair-editor crosshair_overlay DESTINATION bin)
 install(FILES cppcrosshair.desktop DESTINATION share/applications)
 install(FILES icon.png DESTINATION share/pixmaps RENAME cppcrosshair.png)
 
@@ -67,5 +68,7 @@ set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
 set(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6, libqt6widgets6 (>= 6.0), libx11-6, libxext6, libxpm4, procps")
 
 set(CPACK_STRIP_FILES TRUE)
+
+set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/debian/postinst;${CMAKE_CURRENT_SOURCE_DIR}/debian/postrm")
 
 include(CPack)

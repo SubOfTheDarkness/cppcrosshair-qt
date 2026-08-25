@@ -2,20 +2,21 @@
 set -e
 
 if ! docker image inspect cppcrosshair-tester &> /dev/null; then
-    echo "Создание локального образа для тестов..."
+    echo "Создание чистого рантайм-образа для тестов через BuildKit..."
     
-    cat <<EOF | docker build -t cppcrosshair-tester -
+    cat << 'EOF' > Dockerfile.tmp
 FROM ubuntu:24.04
-RUN apt-get update -y && \
-    apt-get install -y libqt6widgets6 libx11-6 libxext6 libxpm4 procps && \
-    rm -rf /var/lib/apt/lists/*
+RUN apt-get update -y && rm -rf /var/lib/apt/lists/*
 EOF
-    echo "Образ для тестов успешно создан"
+
+    DOCKER_BUILDKIT=1 docker build --progress=plain -t cppcrosshair-tester -f Dockerfile.tmp .
+    rm -f Dockerfile.tmp
+    echo "Базовый тестовый образ успешно создан"
 fi
 
 xhost +local:docker > /dev/null
 
-DEB_FILE=$(ls build-deb/cppcrosshair-toolkit_*.deb 2>/dev/null | head -n 1)
+DEB_FILE=$(ls build-deb/*.deb 2>/dev/null | head -n 1)
 
 if [ -z "$DEB_FILE" ]; then
     echo "Ошибка: .deb пакет не найден в папке build-deb/."
@@ -33,9 +34,11 @@ docker run -it --rm \
     -v $XDG_RUNTIME_DIR/$WAYLAND_DISPLAY:$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY:ro \
     -v "$(pwd)":/workspace \
     cppcrosshair-tester /bin/bash -c "
-        dpkg -i /workspace/$DEB_FILE && \
+        apt-get update -y && \
+        apt-get install -y /workspace/$DEB_FILE && \
         echo 'Пакет успешно установлен' && \
-        crosshair_editor
+        echo 'Запуск редактора через созданный системный симлинк...' && \
+        cppcrosshair-toolkit
     "
 
 xhost -local:docker > /dev/null

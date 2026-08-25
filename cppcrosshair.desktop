@@ -2,7 +2,7 @@
 Type=Application
 Name=Crosshair ToolKit
 Comment=Pixel crosshair editor and ultralight overlay
-Exec=crosshair_editor
+Exec=cppcrosshair-editor
 Icon=cppcrosshair
 Terminal=false
 Categories=Game;Utility;

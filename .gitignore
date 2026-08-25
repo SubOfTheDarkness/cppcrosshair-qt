@@ -7,3 +7,5 @@ build-deb
 pkg
 src
 *.tar.zst
+
+*.tmp
