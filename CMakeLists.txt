@@ -38,6 +38,8 @@ add_executable(crosshair_editor
     overlay_editor_window.ui
     pixel_canvas.h
     pixel_canvas.cpp
+    terminal_about_dialog.cpp
+    terminal_about_dialog.h
 )
 target_include_directories(crosshair_editor PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(crosshair_editor PRIVATE 

@@ -29,6 +29,12 @@ int main() {
     sigaction(SIGTERM, &action, nullptr);
     sigaction(SIGINT, &action, nullptr);
 
+    struct sigaction sa_pipe;
+    sa_pipe.sa_handler = SIG_IGN;
+    sigemptyset(&sa_pipe.sa_mask);
+    sa_pipe.sa_flags = 0;
+    sigaction(SIGPIPE, &sa_pipe, nullptr);
+
     std::ifstream check_file(pid_path);
     if (check_file.is_open()) {
         pid_t old_pid;
@@ -136,8 +142,9 @@ int main() {
     bool is_visible = true;
 
     while (true) {
-        if (has_hotkey) {
+        while (XPending(display) > 0) {
             XNextEvent(display, &ev);
+            
             if (ev.type == KeyPress) {
                 if (ev.xkey.keycode == target_keycode && (ev.xkey.state & modifiers)) {
                     if (is_visible) {
@@ -151,9 +158,9 @@ int main() {
                     XFlush(display);
                 }
             }
-        } else {
-            sleep(1);
         }
+
+        usleep(20000); 
     }
 
     unlink(pid_path.c_str());
