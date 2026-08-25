@@ -11,6 +11,7 @@ struct Config {
     std::string xpm_path = "";
     int offset_x = 0;
     int offset_y = 0;
+    std::string hotkey = "";
 };
 
 inline std::string getConfigDir() {
@@ -33,6 +34,7 @@ inline Config loadConfig() {
 
     std::string line;
     while (std::getline(file, line)) {
+        // Убираем пробелы
         line.erase(std::remove_if(line.begin(), line.end(), ::isspace), line.end());
         
         if (line.empty() || line[0] == '#' || line[0] == ';' || line[0] == '[') {
@@ -50,6 +52,8 @@ inline Config loadConfig() {
                 cfg.offset_x = std::stoi(value);
             } else if (key == "offset_y") {
                 cfg.offset_y = std::stoi(value);
+            } else if (key == "hotkey") {
+                cfg.hotkey = value;
             }
         }
     }
@@ -58,7 +62,6 @@ inline Config loadConfig() {
 
 inline bool saveConfig(const Config& cfg) {
     std::string dir = getConfigDir();
-    
     mkdir(dir.c_str(), 0755);
 
     std::string filepath = dir + "/config.ini";
@@ -71,6 +74,7 @@ inline bool saveConfig(const Config& cfg) {
     file << "xpm_path = " << cfg.xpm_path << "\n";
     file << "offset_x = " << cfg.offset_x << "\n";
     file << "offset_y = " << cfg.offset_y << "\n";
+    file << "hotkey = " << cfg.hotkey << "\n";
     
     return true;
 }

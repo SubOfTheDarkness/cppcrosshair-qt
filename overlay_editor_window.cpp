@@ -10,6 +10,20 @@
 #include <signal.h>
 #include "icon.xpm"
 
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+
+static bool x11_grab_failed = false;
+
+static int handleX11HotkeyError(Display *dpy, XErrorEvent *err) {
+    (void)dpy;
+    if (err->error_code == 10) {
+        x11_grab_failed = true;
+    }
+    return 0;
+}
+
+
 OverlayEditorWindow::OverlayEditorWindow(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::overlay_editor_window)
@@ -26,6 +40,7 @@ OverlayEditorWindow::OverlayEditorWindow(QWidget *parent)
     Config cfg = loadConfig();
     ui->xoffset_spin->setValue(cfg.offset_x);
     ui->yoffset_spin->setValue(cfg.offset_y);
+    ui->hotkey_overlay_keyseq->setKeySequence(QKeySequence(QString::fromStdString(cfg.hotkey)));
 
     setupPalette();
     initConnections();
@@ -100,9 +115,52 @@ void OverlayEditorWindow::cancelChanges() {
 }
 
 void OverlayEditorWindow::saveXpmFile() {
+    QString hotkeyStr = ui->hotkey_overlay_keyseq->keySequence().toString(QKeySequence::PortableText);
+
+    if (!hotkeyStr.isEmpty()) {
+        Display* dpy = XOpenDisplay(NULL);
+        if (dpy) {
+            int screen = DefaultScreen(dpy);
+            Window root = RootWindow(dpy, screen);
+
+            QStringList tokens = hotkeyStr.split("+");
+            QString keyChar = tokens.last();
+            
+            unsigned int modifiers = 0;
+            if (hotkeyStr.contains("Ctrl"))    modifiers |= ControlMask;
+            if (hotkeyStr.contains("Alt"))     modifiers |= Mod1Mask;
+            if (hotkeyStr.contains("Shift"))   modifiers |= ShiftMask;
+            if (hotkeyStr.contains("Meta"))    modifiers |= Mod4Mask;
+
+            KeyCode test_keycode = XKeysymToKeycode(dpy, XStringToKeysym(keyChar.toStdString().c_str()));
+            
+            if (test_keycode != 0) {
+                x11_grab_failed = false;
+                XSync(dpy, False);
+                
+                int (*old_handler)(Display*, XErrorEvent*) = XSetErrorHandler(handleX11HotkeyError);
+                
+                XGrabKey(dpy, test_keycode, modifiers, root, False, GrabModeAsync, GrabModeAsync);
+                XSync(dpy, False); 
+                XSetErrorHandler(old_handler);
+                
+                if (x11_grab_failed) {
+                    QMessageBox::critical(this, "Hotkey Conflict", 
+                        QString("The hotkey combination '%1' is already registered by another application!\n\n"
+                                "Please choose a different combination or clear the field to disable it.").arg(hotkeyStr));
+                    XCloseDisplay(dpy);
+                    return;
+                }
+                
+                XUngrabKey(dpy, test_keycode, modifiers, root);
+                XFlush(dpy);
+            }
+            XCloseDisplay(dpy);
+        }
+    }
+
     std::string dir = getConfigDir();
     std::string xpmPath = dir + "/crosshair.xpm";
-
     mkdir(dir.c_str(), 0755);
 
     QFile file(QString::fromStdString(xpmPath));
@@ -144,14 +202,14 @@ void OverlayEditorWindow::saveXpmFile() {
     Config cfg = loadConfig();
     cfg.offset_x = ui->xoffset_spin->value();
     cfg.offset_y = ui->yoffset_spin->value();
+    cfg.hotkey = hotkeyStr.toStdString();
 
     if (!saveConfig(cfg)) {
         QMessageBox::warning(this, "Warning", "Crosshair saved, but config.ini could not be updated!");
         return;
     }
-    QMessageBox::information(this, "Success", "Crosshair successfully saved!");
+    QMessageBox::information(this, "Success", "Configuration successfully saved!");
 }
-
 
 void OverlayEditorWindow::loadXpmFile() {
     ui->pixel_canvas->clearCanvas();

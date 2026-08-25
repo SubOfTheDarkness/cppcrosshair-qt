@@ -267,6 +267,46 @@ QTextEdit#ctrl_log_text {
         </layout>
        </item>
        <item>
+        <layout class="QHBoxLayout" name="hotkey_layout">
+         <item>
+          <spacer name="horizontalSpacer_13">
+           <property name="orientation">
+            <enum>Qt::Orientation::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLabel" name="info_hotkey_lbl">
+           <property name="text">
+            <string>Toggle hotkey:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QKeySequenceEdit" name="hotkey_overlay_keyseq"/>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_14">
+           <property name="orientation">
+            <enum>Qt::Orientation::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
         <layout class="QHBoxLayout" name="editor_funcbtns_layout">
          <item>
           <spacer name="horizontalSpacer_2">

@@ -9,8 +9,25 @@
 #include <sys/stat.h>
 #include "config_parser.h"
 
+const std::string pid_path = "/tmp/crosshair_overlay.pid";
+Display* global_display = nullptr;
+
+void handleSystemSignal(int signum) {
+    (void)signum;
+    unlink(pid_path.c_str());
+    if (global_display) {
+        XCloseDisplay(global_display);
+    }
+    _exit(0);
+}
+
 int main() {
-    const std::string pid_path = "/tmp/crosshair_overlay.pid";
+    struct sigaction action;
+    action.sa_handler = handleSystemSignal;
+    sigemptyset(&action.sa_mask);
+    action.sa_flags = 0;
+    sigaction(SIGTERM, &action, nullptr);
+    sigaction(SIGINT, &action, nullptr);
 
     std::ifstream check_file(pid_path);
     if (check_file.is_open()) {
@@ -33,6 +50,7 @@ int main() {
 
     Display* display = XOpenDisplay(NULL);
     if (!display) return 1;
+    global_display = display;
 
     int screen = DefaultScreen(display);
     Window root = RootWindow(display, screen);
@@ -46,6 +64,7 @@ int main() {
     if (result != XpmSuccess) {
         std::cerr << "[!] Error: Cannot load XPM file: " << cfg.xpm_path << std::endl;
         XCloseDisplay(display);
+        unlink(pid_path.c_str());
         return 1;
     }
 
@@ -70,7 +89,6 @@ int main() {
     );
 
     XSetWindowBackgroundPixmap(display, win, color_pixmap);
-
     XShapeCombineMask(display, win, ShapeBounding, 0, 0, mask_pixmap, ShapeSet);
 
     Region input_region = XCreateRegion();
@@ -78,17 +96,67 @@ int main() {
     XDestroyRegion(input_region);
 
     XMapWindow(display, win);
+    
+    bool has_hotkey = !cfg.hotkey.empty();
+    KeyCode target_keycode = 0;
+    unsigned int modifiers = 0;
+
+    if (has_hotkey) {
+        std::string hk_str = cfg.hotkey;
+        std::string key_char = hk_str;
+        size_t last_plus = hk_str.find_last_of('+');
+        if (last_plus != std::string::npos) {
+            key_char = hk_str.substr(last_plus + 1);
+        }
+
+        if (hk_str.find("Ctrl") != std::string::npos)    modifiers |= ControlMask;
+        if (hk_str.find("Alt") != std::string::npos)     modifiers |= Mod1Mask;
+        if (hk_str.find("Shift") != std::string::npos)   modifiers |= ShiftMask;
+        if (hk_str.find("Meta") != std::string::npos)    modifiers |= Mod4Mask;
+
+        target_keycode = XKeysymToKeycode(display, XStringToKeysym(key_char.c_str()));
+        
+        if (target_keycode != 0) {
+            XGrabKey(display, target_keycode, modifiers, root, False, GrabModeAsync, GrabModeAsync);
+            std::cout << "[*] Hotkey registered actively: " << hk_str << std::endl;
+        } else {
+            has_hotkey = false;
+            std::cout << "[!] Warning: Config contained bad hotkey string. Keyhook disabled." << std::endl;
+        }
+    } else {
+        std::cout << "[*] Running in pure standalone mode (No global hotkey assigned)." << std::endl;
+    }
+    
     XFlush(display);
 
     XFreePixmap(display, color_pixmap);
     XFreePixmap(display, mask_pixmap);
 
+    XEvent ev;
+    bool is_visible = true;
+
     while (true) {
-        sleep(1);
+        if (has_hotkey) {
+            XNextEvent(display, &ev);
+            if (ev.type == KeyPress) {
+                if (ev.xkey.keycode == target_keycode && (ev.xkey.state & modifiers)) {
+                    if (is_visible) {
+                        XUnmapWindow(display, win);
+                        std::cout << "[*] Overlay hidden via hotkey." << std::endl;
+                    } else {
+                        XMapWindow(display, win);
+                        std::cout << "[*] Overlay shown via hotkey." << std::endl;
+                    }
+                    is_visible = !is_visible;
+                    XFlush(display);
+                }
+            }
+        } else {
+            sleep(1);
+        }
     }
 
     unlink(pid_path.c_str());
-
     XCloseDisplay(display);
     return 0;
 }

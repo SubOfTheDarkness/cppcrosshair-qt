@@ -12,7 +12,7 @@ find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets)
 find_package(X11 REQUIRED)
 
 if(NOT X11_Xpm_FOUND)
-    message(FATAL_ERROR "libXpm development package not found! Please install libxpm-dev (Debian/LMDE) or libxpm (Arch/Garuda).")
+    message(FATAL_ERROR "libXpm development package not found! Please install libxpm-dev (Debian) or libxpm (Arch).")
 endif()
 
 add_executable(crosshair_overlay overlay_main.cpp)
@@ -40,7 +40,12 @@ add_executable(crosshair_editor
     pixel_canvas.cpp
 )
 target_include_directories(crosshair_editor PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(crosshair_editor PRIVATE Qt6::Core Qt6::Gui Qt6::Widgets)
+target_link_libraries(crosshair_editor PRIVATE 
+    Qt6::Core 
+    Qt6::Gui 
+    Qt6::Widgets
+    X11::X11
+)
 
 install(TARGETS crosshair_editor crosshair_overlay DESTINATION bin)
 install(FILES cppcrosshair.desktop DESTINATION share/applications)
