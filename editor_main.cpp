@@ -6,7 +6,10 @@ int main(int argc, char *argv[]) {
 
     OverlayEditorWindow window;
     
-    window.setWindowTitle("XPM Crosshair Toolkit (32x32)");
+    QApplication::setApplicationName("Crosshair ToolKit");
+    QApplication::setApplicationVersion("1.0.0");
+
+    window.setWindowTitle(QString("%1 (32x32) - v%2").arg(QApplication::applicationName(), QApplication::applicationVersion()));
     
     window.show();
 

@@ -2,6 +2,7 @@ build
 build-deb
 .cache
 .vscode
+.clangd
 .git
 pkg
 src

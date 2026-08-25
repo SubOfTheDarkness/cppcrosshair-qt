@@ -13,6 +13,27 @@
   <property name="windowTitle">
    <string>Crosshair Editor</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">QPushButton#ctrl_toggle_btn {
+    background-color: #28a745; 
+    color: white; 
+    font-weight: bold; 
+    border-radius: 4px; 
+    padding: 6px 15px;
+}
+QPushButton#ctrl_toggle_btn:hover {
+    background-color: #218838;
+}
+
+QTextEdit#ctrl_log_text {
+    background-color: #0c0c0c;
+    border: 1px solid #222222;
+    font-family: 'Source Code Pro', 'Fira Code', 'Courier New', monospace;
+    font-size: 11px;
+    color: #00C3FF;
+}
+</string>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QTabWidget" name="main_tabs">
@@ -341,7 +362,68 @@
         </layout>
        </item>
        <item>
-        <widget class="QTextEdit" name="ctrl_log_text"/>
+        <widget class="QTextEdit" name="ctrl_log_text">
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_settings">
+      <attribute name="title">
+       <string>Settings</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <item>
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Orientation::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>396</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="sett_about_layout">
+         <item>
+          <spacer name="horizontalSpacer_11">
+           <property name="orientation">
+            <enum>Qt::Orientation::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="sett_about_btn">
+           <property name="text">
+            <string>About</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_12">
+           <property name="orientation">
+            <enum>Qt::Orientation::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
        </item>
       </layout>
      </widget>

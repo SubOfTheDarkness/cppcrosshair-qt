@@ -23,6 +23,8 @@ private slots:
     void saveXpmFile();
     void cancelChanges();
 
+    void showAboutDialog();
+
 private:
     Ui::overlay_editor_window *ui;
     
