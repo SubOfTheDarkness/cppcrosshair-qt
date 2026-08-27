@@ -1,0 +1,18 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "X-Plasma-API-Minimum-Version": "6.0",
+    "KPlugin": {
+        "Id": "com.github.subofthedarkness.cppcrosshair",
+        "Name": "Crosshair Controller",
+        "Description": "Control of the lightweight game overlay for the crosshair",
+        "Icon": "crosshair",
+        "Author": "SubOfTheDarkness",
+        "Version": "1.0",
+        "Website": "https://github.com/SubOfTheDarkness/cppcrosshair-qt",
+        "Category": "Utilities"
+    },
+    "PlasmaProperties": {
+        "ApplicationName": "cppcrosshair",
+        "RequiredExtensions": ["LaunchApp"]
+    }
+}

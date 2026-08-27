@@ -16,10 +16,11 @@ sha256sums=()
 build() {
   cmake -B build -S "$startdir" \
     -DCMAKE_BUILD_TYPE=Release \
+    -DBUILD_PLASMA_WIDGET=OFF \
     -DCMAKE_INSTALL_PREFIX=/usr
   cmake --build build
 }
 
 package() {
-  DESTDIR="$pkgdir" cmake --install build
+  DESTDIR="$pkgdir" cmake --install build --component app
 }

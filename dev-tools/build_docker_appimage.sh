@@ -9,7 +9,7 @@ FROM ubuntu:22.04
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update -y && \
-    apt-get install -y cmake make g++ qt6-base-dev libx11-dev libxext-dev libxpm-dev wget file fuse libgl1-mesa-dev && \
+    apt-get install -y cmake make g++ qt6-base-dev libx11-dev libxext-dev libxpm-dev wget file fuse libgl1-mesa-dev iproute2 procps && \
     rm -rf /var/lib/apt/lists/*
 
 RUN wget -O /usr/bin/linuxdeployqt https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage && \

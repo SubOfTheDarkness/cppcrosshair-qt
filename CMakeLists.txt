@@ -50,9 +50,32 @@ target_link_libraries(cppcrosshair-editor PRIVATE
 )
 
 
-install(TARGETS cppcrosshair-editor crosshair_overlay DESTINATION bin)
-install(FILES cppcrosshair.desktop DESTINATION share/applications)
-install(FILES icon.png DESTINATION share/pixmaps RENAME cppcrosshair.png)
+
+option(BUILD_PLASMA_WIDGET "Build KDE Plasma 6 configuration widget plugin" OFF)
+
+if(BUILD_PLASMA_WIDGET)
+    message(STATUS "-> KDE Plasma 6 widget build is ENABLED")
+    
+    find_package(Qt6 REQUIRED COMPONENTS Qml)
+    add_subdirectory(plasma-widget)
+else()
+    message(STATUS "-> KDE Plasma 6 widget build is DISABLED (Pass -DBUILD_PLASMA_WIDGET=ON to enable)")
+endif()
+
+
+
+install(TARGETS cppcrosshair-editor crosshair_overlay 
+        DESTINATION bin 
+        COMPONENT app)
+
+install(FILES cppcrosshair.desktop 
+        DESTINATION share/applications 
+        COMPONENT app)
+
+install(FILES icon.png 
+        DESTINATION share/pixmaps 
+        RENAME cppcrosshair.png 
+        COMPONENT app)
 
 set(CPACK_PACKAGE_NAME "cppcrosshair-toolkit")
 set(CPACK_PACKAGE_VERSION "1.0.0")
@@ -62,13 +85,16 @@ set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Pixel crosshair manager: standalone light
 set(CPACK_PACKAGE_VENDOR "SubOfTheDarkness")
 
 set(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT) 
-
 set(CPACK_GENERATOR "DEB")
 set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
+
 set(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6, libqt6widgets6 (>= 6.0), libx11-6, libxext6, libxpm4, procps")
 
 set(CPACK_STRIP_FILES TRUE)
-
 set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/debian/postinst;${CMAKE_CURRENT_SOURCE_DIR}/debian/postrm")
+
+set(CPACK_DEB_COMPONENT_INSTALL ON)
+
+set(CPACK_COMPONENTS_ALL app)
 
 include(CPack)
