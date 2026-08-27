@@ -5,28 +5,17 @@ import org.kde.plasma.plasmoid
 import org.kde.plasma.components as PlasmaComponents
 import org.kde.kirigami as Kirigami
 
+import "../backend" 1.0
+
 PlasmoidItem {
     id: root
     
     width: 350
     height: 380
 
-    readonly property var crosshairBackend: backendLoader.item
-
-    Loader {
-        id: backendLoader
-        active: false
-        source: "BackendWrapper.qml"
-
-        onStatusChanged: {
-            if (backendLoader.status === Loader.Ready && backendLoader.item) {
-                console.log("[CROSSHAIR_UI] Backend is loaded. Flashing logs cache...");
-                
-                backendLoader.item.flushCache();
-            }
-        }
+    CrosshairManager {
+        id: crosshairBackend
     }
-
 
     fullRepresentation: Item {
         anchors.fill: parent
@@ -41,15 +30,14 @@ PlasmoidItem {
             RowLayout {
                 Layout.fillWidth: true
                 spacing: 10
-                enabled: root.crosshairBackend !== null 
                 
                 PlasmaComponents.Label { text: "X Offset:" }
                 SpinBox {
                     from: -2048; to: 2048
-                    value: root.crosshairBackend ? root.crosshairBackend.offsetX : 0
+                    value: crosshairBackend.offsetX
                     onValueChanged: {
-                        if (root.crosshairBackend && root.crosshairBackend.offsetX !== value) {
-                            root.crosshairBackend.offsetX = value;
+                        if (crosshairBackend.offsetX !== value) {
+                            crosshairBackend.offsetX = value;
                         }
                     }
                 }
@@ -57,24 +45,23 @@ PlasmoidItem {
                 PlasmaComponents.Label { text: "Y Offset:" }
                 SpinBox {
                     from: -2048; to: 2048
-                    value: root.crosshairBackend ? root.crosshairBackend.offsetY : 0
+                    value: crosshairBackend.offsetY
                     onValueChanged: {
-                        if (root.crosshairBackend && root.crosshairBackend.offsetY !== value) {
-                            root.crosshairBackend.offsetY = value;
+                        if (crosshairBackend.offsetY !== value) {
+                            crosshairBackend.offsetY = value;
                         }
                     }
                 }
             }
 
-            PlasmaComponents.Label { text: "Toggle Hotkey:"; font.bold: true }
+            PlasmaComponents.Label { text: "Toggle hotkey:"; font.bold: true }
             
             PlasmaComponents.TextField {
                 id: hotkeyField
                 Layout.fillWidth: true
-                enabled: root.crosshairBackend !== null
-                placeholderText: "Press key sequence..."
+                placeholderText: "Press keq sequence..."
                 
-                text: root.crosshairBackend ? root.crosshairBackend.hotkey : ""
+                text: crosshairBackend.hotkey
                 readOnly: true
                 
                 background: Rectangle {
@@ -99,16 +86,14 @@ PlasmoidItem {
                     var keyText = String.fromCharCode(event.key).toUpperCase();
                     
                     if (event.key === Qt.Key_Backspace || event.key === Qt.Key_Delete) {
-                        if (root.crosshairBackend) root.crosshairBackend.hotkey = "";
+                        crosshairBackend.hotkey = "";
                         event.accepted = true;
                         return;
                     }
 
                     if (keyText !== "") {
                         modifiers.push(keyText);
-                        if (root.crosshairBackend) {
-                            root.crosshairBackend.hotkey = modifiers.join("+");
-                        }
+                        crosshairBackend.hotkey = modifiers.join("+");
                     }
                     event.accepted = true;
                 }
@@ -119,22 +104,21 @@ PlasmoidItem {
             RowLayout {
                 Layout.fillWidth: true
                 spacing: 6
-                enabled: root.crosshairBackend !== null
 
                 PlasmaComponents.Button {
                     Layout.fillWidth: true
-                    text: (root.crosshairBackend && root.crosshairBackend.isRunning) ? "Stop Overlay" : "Start Overlay"
-                    checked: root.crosshairBackend ? root.crosshairBackend.isRunning : false
-                    onClicked: if (root.crosshairBackend) root.crosshairBackend.toggleOverlay()
+                    text: crosshairBackend.isRunning ? "Stop Overlay" : "Start Overlay"
+                    checked: crosshairBackend.isRunning
+                    onClicked: crosshairBackend.toggleOverlay()
                 }
 
                 PlasmaComponents.Button {
                     text: "Save Settings"
-                    onClicked: if (root.crosshairBackend) root.crosshairBackend.saveSettings()
+                    onClicked: crosshairBackend.saveSettings()
                 }
             }
 
-            PlasmaComponents.Label { text: "Processes log:"; font.bold: true }
+            PlasmaComponents.Label { text: "Processes logs:"; font.bold: true }
             
             ScrollView {
                 Layout.fillWidth: true
@@ -154,18 +138,16 @@ PlasmoidItem {
                     wrapMode: TextArea.Wrap
                     width: parent.width
 
-                    Component.onCompleted: {
-                        console.log("[CROSSHAIR_LOG] Interface is fully built. Connecting the C++ backend....");
-                        
-                        backendLoader.active = true;
-                    }
-
                     Connections {
-                        target: root.crosshairBackend
+                        target: crosshairBackend
                         
                         function onLogMessage(msg) {
                             logMonitor.append(msg);
                         }
+                    }
+
+                    Component.onCompleted: {
+                        crosshairBackend.flushCache();
                     }
                 }
             }
@@ -173,11 +155,8 @@ PlasmoidItem {
             PlasmaComponents.Button {
                 Layout.fillWidth: true
                 text: "Open editor"
-                enabled: root.crosshairBackend !== null
                 onClicked: {
-                    if (root.crosshairBackend) {
-                        root.crosshairBackend.openEditorApp();
-                    }
+                    crosshairBackend.openEditorApp();
                 }
             }
         }

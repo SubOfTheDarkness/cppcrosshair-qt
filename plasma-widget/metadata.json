@@ -13,6 +13,7 @@
     },
     "PlasmaProperties": {
         "ApplicationName": "cppcrosshair",
-        "RequiredExtensions": ["LaunchApp"]
+        "RequiredExtensions": ["LaunchApp"],
+        "X-Plasma-Extra-Runtime-Dependencies": ["contents"]
     }
 }
